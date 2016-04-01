@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>index</title>
+</head><body>Title<br>
+
+Android Application to Detect Best Images in a Burst (Need to change)<br>
+
+<br>
+
+Summary<br>
+
+<br>
+
+We are going to create an Android application that efficiently uses the
+parallel processing capabilities of an Android-based machine&#8217;s
+GPU to rapidly perform parallel image analysis on a burst . <br>
+
+<br>
+
+Background<br>
+
+<br>
+
+We are interested in creating an application that can simplify and
+accelerate the process of selecting the best image from a burst.
+Specifically, a burst contains a large number of images and it is often
+cumbersome to sift through all the images to find the best one. Our
+application aims to detect the images with the highest rate of people
+with eyes open and smiling. If none of the images completely match all
+the parameters, then our application will create a composite image i.e.
+stitching together an image - from the entire library of burst - where
+everyone is smiling with their eyes open. <br>
+
+<br>
+
+A sequential version of the application has several bottlenecks: <br>
+
+<br>
+
+i)&nbsp;&nbsp;&nbsp; Serial analysis and execution of each image in the
+burst will be extremely slow as there is a large number of photographs
+in burst.&nbsp; We aim to provide a near real-time solution to the
+problem. <br>
+
+ii)&nbsp;&nbsp;&nbsp; Sequentially analyzing each image for face and
+eye detection will be extremely slow, and applying a serial vision
+algorithm to all the images in the burst would take a long time and a
+lot of processing power. <br>
+
+iii)&nbsp;&nbsp;&nbsp; Creating the composite image sequentially will be a bottleneck in the runtime of this application. <br>
+
+iv)&nbsp;&nbsp;&nbsp; Most importantly, a sequential version of the
+whole application will not be able to benefit from the machine&#8217;s
+GPU power and will also slow down the CPU as it will perform a lot of
+tasks on the latter. &nbsp;&nbsp;&nbsp; <br>
+
+<br>
+
+Therefore, all the aforementioned aspects of the application can be
+significantly improved from parallelism. We plan to use OpenCL
+(Android&#8217;s version of CUDA) to exploit parallelism in the
+multi-core chip. The benefits of a parallel application be better
+understood using the following illustrations highlighting the
+difference between the sequential and parallel versions. <br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+&nbsp;<br>
+
+Figure 1.1: Burst<br>
+
+<br>
+
+<br>
+
+Applying to the sequential version<br>
+
+<br>
+
+&nbsp;<br>
+
+&nbsp;<br>
+
+<br>
+
+&nbsp;<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+Now Applying to the parallel version <br>
+
+(Different colors represent different threads)<br>
+
+<br>
+
+&nbsp;<br>
+
+<br>
+
+<br>
+
+Sequential algorithm for Vision Analysis <br>
+
+(points found in serial execution)<br>
+
+<br>
+
+&nbsp;<br>
+
+Parallel algorithm for Vision Analysis , <br>
+
+<br>
+
+&nbsp;<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+The Challenge <br>
+
+<br>
+
+The application is challenging in a number of ways: <br>
+
+<br>
+
+i)&nbsp;&nbsp;&nbsp; OpenCL is written in C/C++ whereas Android
+applications are written in Java. As we plan to make our code highly
+parallelizable to specific machines (fully exploiting our knowledge of
+the chips), we will have to compile C++ OpenCL code in our Java code.<br>
+
+ii)&nbsp;&nbsp;&nbsp; As a burst contains a large number of images,
+there will be a high amount of memory accesses. This implies that a lot
+will depend on making sure that the computation-to-communication ratio
+is high. To ensure that the computation-to-communication ratio is high,
+we will need to handle cache optimizations of image data well in order
+to achieve maximum cache hits. <br>
+
+iii)&nbsp;&nbsp;&nbsp; Efficiently detecting facial features is a lot
+more than simply sending different parts of the image to different
+cores; we will have to make sure that distribution of work is even and
+handle cases that require high computation with more processing power. <br>
+
+iv)&nbsp;&nbsp;&nbsp; Stitching together an image will require a lot of
+inter-communication between processes and more processing power, which
+means that we will need to dynamically handle parallel processing of
+the code based not only on the dataset (burst) but also on what the
+algorithm is working on &#8211; eye detection, smile detection,
+stitching, etc. <br>
+
+v)&nbsp;&nbsp;&nbsp; During the analysis of each image, our application
+will perform numerous checks to see if the input meets some
+requirements. A high number of &#8216;if&#8217; statements might cause
+divergent control flow execution, which will need to be handled in way
+that it does not affect accuracy at the cost of speedup. <br>
+
+<br>
+
+Platform Choice<br>
+
+<br>
+
+TO DO<br>
+
+<br>
+
+Stretch Goal<br>
+
+<br>
+
+As a layer on top of the application, we plan to add a parallel Machine
+Learning program. Specifically, we aim to supply this program with a
+large number of training bursts and run it in a highly efficient and
+parallel way (parallelizing over the CPU and the GPU) to make our
+application quickly recognize important features of an image such as
+landscape/portrait, daylight/night, etc. This will then help to speed
+the rest of the application. <br>
+
+<br>
+
+SCHEDULE <br>
+
+<br>
+
+TO<br>
+
+<br>
+
+<br>
+
+References<br>
+
+<br>
+
+http://www1.cs.columbia.edu/CAVE/publications/pdfs/Bitouk_SIGGRAPH08.pdf<br>
+
+https://daim.idi.ntnu.no/masteroppgaver/004/4762/masteroppgave.pdf<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+&#8195;<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+&nbsp;<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+&nbsp;<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+¬¬¬<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+
+</body></html>
