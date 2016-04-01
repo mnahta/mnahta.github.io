@@ -1,0 +1,94 @@
+<p>Title</p>
+<p>Android Application to Detect Best Images in a Burst (<em>Need to change</em>)</p>
+<p>Summary</p>
+<p>We are going to create an Android application that efficiently uses the parallel processing capabilities of an Android-based machine&rsquo;s GPU to rapidly perform parallel image analysis on a <em>burst<a href="#_ftn1" name="_ftnref1"><strong>[1]</strong></a></em>.</p>
+<p>Background</p>
+<p>We are interested in creating an application that can simplify and accelerate the process of selecting the best image from a burst. Specifically, a <em>burst</em> contains a large number of images and it is often cumbersome to sift through all the images to find the best one. Our application aims to detect the images with the highest rate of people with eyes open and smiling. If none of the images completely match all the parameters, then our application will create a composite image i.e. stitching together an image - from the entire library of <em>burst</em> - where everyone is smiling with their eyes open.</p>
+<p>A sequential version of the application has several bottlenecks:</p>
+<ol>
+<li>Serial analysis and execution of each image in the <em>burst</em> will be extremely slow as there is a large number of photographs in <em>burst</em>. We aim to provide a near real-time solution to the problem.</li>
+<li>Sequentially analyzing each image for face and eye detection will be extremely slow, and applying a serial vision algorithm to all the images in the <em>burst</em> would take a long time and a lot of processing power.</li>
+</ol>
+<ul>
+<li>Creating the composite image sequentially will be a bottleneck in the runtime of this application.</li>
+</ul>
+<ol>
+<li>Most importantly, a sequential version of the whole application will not be able to benefit from the machine&rsquo;s GPU power and will also slow down the CPU as it will perform a lot of tasks on the latter.</li>
+</ol>
+<p>Therefore, all the aforementioned aspects of the application can be significantly improved from parallelism. We plan to use <strong>OpenCL</strong> (Android&rsquo;s version of <strong>CUDA</strong>) to exploit parallelism in the multi-core chip. The benefits of a parallel application be better understood using the following illustrations highlighting the difference between the sequential and parallel versions.</p>
+<p>Figure 1.1: Burst</p>
+<p>Applying to the sequential version</p>
+<p>Now Applying to the <strong>parallel</strong> version<a href="#_ftn2" name="_ftnref2">[2]</a></p>
+<p>(Different colors represent different threads)</p>
+<p>Sequential algorithm for Vision Analysis<a href="#_ftn3" name="_ftnref3">[3]</a></p>
+<p>(points found in serial execution)</p>
+<p>Parallel algorithm for Vision Analysis<a href="#_ftn4" name="_ftnref4">[4]</a><sup>,<a href="#_ftn5" name="_ftnref5">[5]</a></sup></p>
+<p></p>
+<p>The Challenge</p>
+<p>The application is challenging in a number of ways:</p>
+<ol>
+<li>OpenCL is written in C/C++ whereas Android applications are written in Java. As we plan to make our code highly parallelizable to specific machines (fully exploiting our knowledge of the chips), we will have to compile C++ OpenCL code in our Java code.</li>
+<li>As a <em>burst</em> contains a large number of images, there will be a high amount of memory accesses. This implies that a lot will depend on making sure that the computation-to-communication ratio is high. To ensure that the computation-to-communication ratio is high, we will need to handle cache optimizations of image data well in order to achieve maximum cache hits.</li>
+</ol>
+<ul>
+<li>Efficiently detecting facial features is a lot more than simply sending different parts of the image to different cores; we will have to make sure that distribution of work is even and handle cases that require high computation with more processing power.</li>
+</ul>
+<ol>
+<li>Stitching together an image will require a lot of inter-communication between processes and more processing power, which means that we will need to dynamically handle parallel processing of the code based not only on the dataset (<em>burst</em>) but also on what the algorithm is working on &ndash; eye detection, smile detection, stitching, etc.</li>
+<li>During the analysis of each image, our application will perform numerous checks to see if the input meets some requirements. A high number of &lsquo;if&rsquo; statements might cause divergent control flow execution, which will need to be handled in way that it does not affect accuracy at the cost of speedup.</li>
+</ol>
+<p>Platform Choice</p>
+<p>TO DO</p>
+<p>Stretch Goal</p>
+<p>As a layer on top of the application, we plan to add a parallel Machine Learning program. Specifically, we aim to supply this program with a large number of training <em>bursts</em> and run it in a highly efficient and parallel way (parallelizing over the CPU and the GPU) to make our application quickly recognize important features of an image such as landscape/portrait, daylight/night, etc. This will then help to speed the rest of the application.</p>
+<p>SCHEDULE</p>
+<p>TO</p>
+<p>References</p>
+<p><a href="http://www1.cs.columbia.edu/CAVE/publications/pdfs/Bitouk_SIGGRAPH08.pdf">http://www1.cs.columbia.edu/CAVE/publications/pdfs/Bitouk_SIGGRAPH08.pdf</a></p>
+<p>https://daim.idi.ntnu.no/masteroppgaver/004/4762/masteroppgave.pdf</p>
+<p>&shy;&shy;&shy;</p>
+<table>
+<tbody>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+<tr>
+</tr>
+</tbody>
+</table>
+<table>
+<tbody>
+<tr>
+</tr>
+<tr>
+</tr>
+</tbody>
+</table>
+<p><a href="#_ftnref1" name="_ftn1">[1]</a> Burst: several photographs captured in quick succession</p>
+<p><a href="#_ftnref2" name="_ftn2">[2]</a> For illustrative purposes, assuming a 4 core machine.</p>
+<p><a href="#_ftnref3" name="_ftn3">[3]</a> Image taken from http://www.engineersgarage.com/sites/default/files/imagecache/Original/wysiwyg_imageupload/28714/Face-Recognition.jpg</p>
+<p><a href="#_ftnref4" name="_ftn4">[4]</a> Image taken from http://www.engineersgarage.com/sites/default/files/imagecache/Original/wysiwyg_imageupload/28714/Face-Recognition.jpg</p>
+<p><a href="#_ftnref5" name="_ftn5">[5]</a> For illustrative purposes assuming a 4 core machine</p>
